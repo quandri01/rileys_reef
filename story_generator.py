@@ -2,7 +2,6 @@ import os
 import sys
 
 def generate_story(creature, scientific_name, shopify_url, image_url, facts):
-    # Gracefully hide missing elements
     shopify_section = (
         f'<p>Want your very own {creature.title()} figure? '
         f'<a href="{shopify_url}">Click here</a> to see it in our store!</p>'

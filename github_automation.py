@@ -74,9 +74,9 @@ else:
     selected = pick_random_creature()
     creature = selected["name"]
     scientific = get_scientific_name(creature)
-    shopify = selected["shopify"]
-    image = selected["image"]
-    facts = selected["facts"]
+    shopify = selected.get("shopify", "")
+    image = selected.get("image", "")
+    facts = selected.get("facts", [])
 
 print(f"\n🐠 Generating content for: {creature}\nScientific name: {scientific}\n")
 

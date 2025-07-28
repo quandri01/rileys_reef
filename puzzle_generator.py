@@ -3,7 +3,7 @@ import sys
 
 def generate(creature, level):
     html = f"<html><body><h1>{level.title()} Puzzle – {creature.title()}</h1>" \
-           "<!-- puzzle grid here -->" \
+           "<!-- puzzle content here -->" \
            "</body></html>"
     outfolder = os.path.join("puzzles", level.lower())
     os.makedirs(outfolder, exist_ok=True)
@@ -13,7 +13,7 @@ def generate(creature, level):
     print(f"✅ Puzzle generated: {filename}")
 
 def main():
-    creature = sys.argv[1]
+    creature = sys.argv[1] if len(sys.argv) > 1 else "sea_creature"
     for level in ["easy", "medium", "tricky_fish"]:
         generate(creature, level)
 
