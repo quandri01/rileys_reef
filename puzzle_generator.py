@@ -18,4 +18,4 @@ with open(CROSSWORD_FILE, "w") as f:
     f.write("Crossword Puzzle\n")
     f.write("Placeholder puzzle content\n")
 
-print("✅ Puzzles generated successfully.")
+print("Puzzles generated successfully.")
