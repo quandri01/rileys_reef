@@ -1,50 +1,54 @@
-import os
 import subprocess
-import datetime
+import sys
+import os
+from datetime import datetime
 
-# --- CONFIG ---
-REPO_PATH = r"C:\rileys_reef"  # Local repository path
-BRANCH = "main"
-COMMIT_MESSAGE = f"Auto-update puzzles {datetime.datetime.now():%Y-%m-%d %H:%M:%S}"
+# ANSI colors for Windows (enabled by default in Python 3.13+)
+GREEN = "\033[92m"
+YELLOW = "\033[93m"
+RED = "\033[91m"
+RESET = "\033[0m"
+CHECK = "\u2705"  # ✅
+WARN = "\u26A0"   # ⚠️
+FAIL = "\u274C"   # ❌
 
-def run_command(command, cwd=None):
-    """Run shell commands and print output."""
-    result = subprocess.run(command, cwd=cwd, shell=True, text=True, capture_output=True)
-    if result.stdout:
-        print(result.stdout)
-    if result.stderr:
-        print(result.stderr)
-    return result.returncode
+def print_section(title, color=YELLOW):
+    print(f"\n{color}{'='*10} {title} {'='*10}{RESET}\n")
 
-def generate_puzzles():
-    """Run your puzzle generation script."""
-    print("🔄 Generating puzzles...")
-    return run_command("py puzzle_generator.py", cwd=REPO_PATH)
+def run_command(command, success_msg=None, error_msg=None):
+    try:
+        subprocess.run(command, check=True)
+        if success_msg:
+            print(f"{GREEN}{CHECK} {success_msg}{RESET}")
+    except subprocess.CalledProcessError:
+        if error_msg:
+            print(f"{RED}{FAIL} {error_msg}{RESET}")
+        sys.exit(1)
 
-def git_commit_and_push():
-    """Commit and push changes safely."""
-    print("🔄 Adding changes...")
-    run_command("git add .", cwd=REPO_PATH)
+print_section("Starting Riley's Reef Automation", GREEN)
 
-    print("🔄 Committing...")
-    run_command(f'git commit -m "{COMMIT_MESSAGE}"', cwd=REPO_PATH)
+# 1. Generate puzzles
+print_section("Generating Puzzles")
+try:
+    subprocess.run(["py", "puzzle_generator.py"], check=True)
+    print(f"{GREEN}{CHECK} Puzzles generated successfully.{RESET}")
+except subprocess.CalledProcessError:
+    print(f"{RED}{FAIL} Puzzle generation failed.{RESET}")
+    sys.exit(1)
 
-    print("🚀 Pushing to GitHub...")
-    run_command(f"git push -u origin {BRANCH}", cwd=REPO_PATH)
+# 2. Add changes
+print_section("Adding Changes")
+run_command(["git", "add", "."], "Changes added to Git.", "Failed to add changes.")
 
-def main():
-    print("🚀 Starting Riley's Reef Automation...")
-    
-    # Generate puzzles
-    if generate_puzzles() == 0:
-        print("✅ Puzzles generated successfully.")
-    else:
-        print("❌ Puzzle generation failed.")
-        return
+# 3. Commit changes
+print_section("Committing")
+commit_message = f"Auto-update puzzles {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+run_command(["git", "commit", "-m", commit_message],
+            "Commit successful.",
+            "Nothing to commit or commit failed.")
 
-    # Commit and push
-    git_commit_and_push()
-    print("🎉 GitHub updated successfully!")
-
-if __name__ == "__main__":
-    main()
+# 4. Push to GitHub
+print_section("Pushing to GitHub", GREEN)
+run_command(["git", "push", "origin", "main"],
+            "GitHub updated successfully!",
+            "Failed to push to GitHub.")
