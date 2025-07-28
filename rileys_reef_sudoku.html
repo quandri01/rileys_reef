@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Riley’s Reef Sudoku</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f0fbff; text-align: center; }
+    table { margin: auto; border-collapse: collapse; }
+    td {
+      width: 80px; height: 80px;
+      border: 1px solid #aaa;
+      font-size: 20px;
+      text-align: center;
+      vertical-align: middle;
+      cursor: pointer;
+      background-color: #fff;
+    }
+    .grid-table td:hover {
+      background-color: #e0f7fa;
+    }
+  </style>
+  <script>
+    const symbols = ['Clownfish', 'Manta Ray', 'Seahorse', 'Pufferfish'];
+    function cycleSymbol(cell) {
+      const current = cell.innerText;
+      const index = symbols.indexOf(current);
+      const next = symbols[(index + 1) % symbols.length];
+      cell.innerText = next;
+    }
+  </script>
+</head>
+<body>
+
+<h1>🐚 Riley’s Reef Sudoku</h1>
+<p>Click a square to cycle through sea creatures. Try to make sure each row and column has one of each!</p>
+
+<table class="grid-table">
+<tr><td onclick="cycleSymbol(this)">Seahorse</td><td onclick="cycleSymbol(this)">Pufferfish</td><td onclick="cycleSymbol(this)">Clownfish</td><td onclick="cycleSymbol(this)">Manta Ray</td></tr>
+<tr><td onclick="cycleSymbol(this)">Clownfish</td><td onclick="cycleSymbol(this)">Manta Ray</td><td onclick="cycleSymbol(this)">Seahorse</td><td onclick="cycleSymbol(this)">Pufferfish</td></tr>
+<tr><td onclick="cycleSymbol(this)">Manta Ray</td><td onclick="cycleSymbol(this)">Seahorse</td><td onclick="cycleSymbol(this)">Pufferfish</td><td onclick="cycleSymbol(this)">Clownfish</td></tr>
+<tr><td onclick="cycleSymbol(this)">Pufferfish</td><td onclick="cycleSymbol(this)">Clownfish</td><td onclick="cycleSymbol(this)">Manta Ray</td><td onclick="cycleSymbol(this)">Seahorse</td></tr>
+
+</table>
+
+</body>
+</html>
