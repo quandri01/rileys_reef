@@ -1,54 +1,101 @@
 import subprocess
-import sys
 import os
+import json
+import random
+import requests
 from datetime import datetime
 
-# ANSI colors for Windows (enabled by default in Python 3.13+)
-GREEN = "\033[92m"
-YELLOW = "\033[93m"
-RED = "\033[91m"
-RESET = "\033[0m"
-CHECK = "\u2705"  # ✅
-WARN = "\u26A0"   # ⚠️
-FAIL = "\u274C"   # ❌
+# === CONFIG ===
+REPO_PATH = r"C:\rileys_reef"
+PUZZLE_DIR = os.path.join(REPO_PATH, "puzzles")
+STORY_DIR = os.path.join(REPO_PATH, "stories")
+CREATURE_FILE = os.path.join(REPO_PATH, "creatures.json")
+USED_FILE = os.path.join(REPO_PATH, "used_creatures.json")
 
-def print_section(title, color=YELLOW):
-    print(f"\n{color}{'='*10} {title} {'='*10}{RESET}\n")
+# === FOLDER SETUP ===
+os.makedirs(PUZZLE_DIR, exist_ok=True)
+for lvl in ["easy", "medium", "tricky_fish"]:
+    os.makedirs(os.path.join(PUZZLE_DIR, lvl), exist_ok=True)
+os.makedirs(STORY_DIR, exist_ok=True)
 
-def run_command(command, success_msg=None, error_msg=None):
+# === Load creatures ===
+with open(CREATURE_FILE, "r", encoding="utf-8") as f:
+    creatures = json.load(f)
+
+used = []
+if os.path.exists(USED_FILE):
+    with open(USED_FILE, "r", encoding="utf-8") as f:
+        used = json.load(f)
+
+# === Helper: Fetch scientific name ===
+def get_scientific_name(creature):
     try:
-        subprocess.run(command, check=True)
-        if success_msg:
-            print(f"{GREEN}{CHECK} {success_msg}{RESET}")
-    except subprocess.CalledProcessError:
-        if error_msg:
-            print(f"{RED}{FAIL} {error_msg}{RESET}")
-        sys.exit(1)
+        response = requests.get(
+            f"https://api.gbif.org/v1/species/match?name={creature}"
+        )
+        data = response.json()
+        return data.get("scientificName", creature)
+    except Exception as e:
+        print(f"⚠️ Could not fetch scientific name for {creature}. Using fallback.")
+        return creature
 
-print_section("Starting Riley's Reef Automation", GREEN)
+# === Helper: Clean old files ===
+def clean_old_files():
+    for root, dirs, files in os.walk(PUZZLE_DIR):
+        for file in files:
+            os.remove(os.path.join(root, file))
+    for file in os.listdir(STORY_DIR):
+        os.remove(os.path.join(STORY_DIR, file))
+    print("🧹 Old puzzles and stories cleaned.")
 
-# 1. Generate puzzles
-print_section("Generating Puzzles")
-try:
-    subprocess.run(["py", "puzzle_generator.py"], check=True)
-    print(f"{GREEN}{CHECK} Puzzles generated successfully.{RESET}")
-except subprocess.CalledProcessError:
-    print(f"{RED}{FAIL} Puzzle generation failed.{RESET}")
-    sys.exit(1)
+# === Random Picker ===
+def pick_random_creature():
+    available = [c for c in creatures if c["name"] not in used]
+    if not available:
+        used.clear()
+        available = creatures
+    chosen = random.choice(available)
+    used.append(chosen["name"])
+    with open(USED_FILE, "w", encoding="utf-8") as f:
+        json.dump(used, f)
+    return chosen
 
-# 2. Add changes
-print_section("Adding Changes")
-run_command(["git", "add", "."], "Changes added to Git.", "Failed to add changes.")
+# === Prompt: Manual or Auto ===
+manual = input("Manual run? (y/n): ").strip().lower() == "y"
 
-# 3. Commit changes
-print_section("Committing")
-commit_message = f"Auto-update puzzles {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-run_command(["git", "commit", "-m", commit_message],
-            "Commit successful.",
-            "Nothing to commit or commit failed.")
+if manual:
+    clean_old_files()
+    creature = input("Enter Creature Name: ").strip()
+    scientific = get_scientific_name(creature)
+    shopify = input("Enter Shopify URL: ").strip()
+    image = input("Enter Image URL: ").strip()
+    facts = input("Enter Fun Facts (comma separated): ").strip().split(",")
+else:
+    selected = pick_random_creature()
+    creature = selected["name"]
+    scientific = get_scientific_name(creature)
+    shopify = selected["shopify"]
+    image = selected["image"]
+    facts = selected["facts"]
 
-# 4. Push to GitHub
-print_section("Pushing to GitHub", GREEN)
-run_command(["git", "push", "origin", "main"],
-            "GitHub updated successfully!",
-            "Failed to push to GitHub.")
+print(f"\n🐠 Generating content for: {creature}\nScientific name: {scientific}\n")
+
+# === Generate Puzzles ===
+subprocess.run(["py", "puzzle_generator.py", creature], cwd=REPO_PATH, check=True)
+print("✅ Puzzles generated")
+
+# === Generate Story ===
+story_cmd = ["py", "story_generator.py", creature, scientific, shopify, image] + facts
+subprocess.run(story_cmd, cwd=REPO_PATH, check=True)
+print("✅ Story generated")
+
+# === Git Push ===
+subprocess.run(["git", "add", "."], cwd=REPO_PATH, check=True)
+commit_msg = f"Auto-update {creature} {datetime.now():%Y-%m-%d %H:%M:%S}"
+subprocess.run(["git", "commit", "-m", commit_msg], cwd=REPO_PATH)
+subprocess.run(["git", "push", "origin", "main"], cwd=REPO_PATH)
+print("🚀 GitHub updated successfully")
+
+# === Send Preview Email ===
+subprocess.run(["py", "send_preview_email.py", creature], cwd=REPO_PATH, check=True)
+print("📧 Preview email sent successfully")

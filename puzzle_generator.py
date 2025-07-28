@@ -1,21 +1,21 @@
 import os
-from datetime import datetime
+import sys
 
-# === OUTPUT FOLDERS ===
-OUTPUT_DIR = os.path.join(os.getcwd(), "puzzles")
-SUDOKU_FILE = os.path.join(OUTPUT_DIR, f"sudoku_{datetime.now().strftime('%Y%m%d')}.txt")
-CROSSWORD_FILE = os.path.join(OUTPUT_DIR, f"crossword_{datetime.now().strftime('%Y%m%d')}.txt")
+def generate(creature, level):
+    html = f"<html><body><h1>{level.title()} Puzzle – {creature.title()}</h1>" \
+           "<!-- puzzle grid here -->" \
+           "</body></html>"
+    outfolder = os.path.join("puzzles", level.lower())
+    os.makedirs(outfolder, exist_ok=True)
+    filename = os.path.join(outfolder, f"{creature.lower()}_{level.lower()}.html")
+    with open(filename, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"✅ Puzzle generated: {filename}")
 
-# === ENSURE OUTPUT FOLDER EXISTS ===
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+def main():
+    creature = sys.argv[1]
+    for level in ["easy", "medium", "tricky_fish"]:
+        generate(creature, level)
 
-# === GENERATE SIMPLE PLACEHOLDER PUZZLES ===
-with open(SUDOKU_FILE, "w") as f:
-    f.write("Sudoku Puzzle\n")
-    f.write("Placeholder puzzle content\n")
-
-with open(CROSSWORD_FILE, "w") as f:
-    f.write("Crossword Puzzle\n")
-    f.write("Placeholder puzzle content\n")
-
-print("Puzzles generated successfully.")
+if __name__ == "__main__":
+    main()

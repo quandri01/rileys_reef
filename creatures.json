@@ -1,0 +1,202 @@
+[
+    {
+        "name": "Clownfish",
+        "shopify": "https://yourshopify.com/products/clownfish",
+        "image": "https://yourshopify.com/images/clownfish.jpg",
+        "facts": [
+            "Clownfish live among sea anemones for protection.",
+            "They have a special coating that keeps them from being stung.",
+            "Some clownfish can change gender when needed."
+        ]
+    },
+    {
+        "name": "Sea Turtle",
+        "shopify": "https://yourshopify.com/products/sea-turtle",
+        "image": "https://yourshopify.com/images/seaturtle.jpg",
+        "facts": [
+            "Sea turtles can live for over 80 years.",
+            "They migrate thousands of miles between feeding grounds and nesting sites.",
+            "Their shells protect them from predators."
+        ]
+    },
+    {
+        "name": "Starfish",
+        "shopify": "https://yourshopify.com/products/starfish",
+        "image": "https://yourshopify.com/images/starfish.jpg",
+        "facts": [
+            "Starfish can regenerate lost arms.",
+            "They have no brain but use nerve nets to move.",
+            "There are over 2,000 species of starfish worldwide."
+        ]
+    },
+    {
+        "name": "Octopus",
+        "shopify": "https://yourshopify.com/products/octopus",
+        "image": "https://yourshopify.com/images/octopus.jpg",
+        "facts": [
+            "Octopuses have three hearts and blue blood.",
+            "They are masters of camouflage and problem-solving.",
+            "Some species can detach an arm to escape predators."
+        ]
+    },
+    {
+        "name": "Blue Tang",
+        "shopify": "https://yourshopify.com/products/blue-tang",
+        "image": "https://yourshopify.com/images/blue-tang.jpg",
+        "facts": [
+            "Blue tangs are known for their vibrant color.",
+            "They are popular in coral reefs.",
+            "They can change shades when stressed."
+        ]
+    },
+    {
+        "name": "Hammerhead Shark",
+        "shopify": "https://yourshopify.com/products/hammerhead-shark",
+        "image": "https://yourshopify.com/images/hammerhead-shark.jpg",
+        "facts": [
+            "Hammerhead sharks have a unique head shape for improved vision.",
+            "They can live up to 20-30 years.",
+            "They often swim in schools during the day."
+        ]
+    },
+    {
+        "name": "Lionfish",
+        "shopify": "https://yourshopify.com/products/lionfish",
+        "image": "https://yourshopify.com/images/lionfish.jpg",
+        "facts": [
+            "Lionfish have venomous spines.",
+            "They are native to the Indo-Pacific region.",
+            "They are invasive in the Atlantic Ocean."
+        ]
+    },
+    {
+        "name": "Manta Ray",
+        "shopify": "https://yourshopify.com/products/manta-ray",
+        "image": "https://yourshopify.com/images/manta-ray.jpg",
+        "facts": [
+            "Manta rays can reach up to 23 feet in width.",
+            "They are filter feeders.",
+            "They are known for their graceful swimming."
+        ]
+    },
+    {
+        "name": "Moray Eel",
+        "shopify": "https://yourshopify.com/products/moray-eel",
+        "image": "https://yourshopify.com/images/moray-eel.jpg",
+        "facts": [
+            "Moray eels have a second set of jaws.",
+            "They prefer rocky crevices to hide.",
+            "They can grow up to 13 feet long."
+        ]
+    },
+    {
+        "name": "Sea Horse",
+        "shopify": "https://yourshopify.com/products/sea-horse",
+        "image": "https://yourshopify.com/images/sea-horse.jpg",
+        "facts": [
+            "Sea horses are unique for male pregnancy.",
+            "They use their tails to hold onto seaweed.",
+            "They swim upright, unlike most fish."
+        ]
+    },
+    {
+        "name": "Parrotfish",
+        "shopify": "https://yourshopify.com/products/parrotfish",
+        "image": "https://yourshopify.com/images/parrotfish.jpg",
+        "facts": [
+            "Parrotfish have beak-like teeth.",
+            "They play a role in creating sand in coral reefs.",
+            "They change color and gender as they grow."
+        ]
+    },
+    {
+        "name": "Triggerfish",
+        "shopify": "https://yourshopify.com/products/triggerfish",
+        "image": "https://yourshopify.com/images/triggerfish.jpg",
+        "facts": [
+            "Triggerfish are known for their strong jaws.",
+            "They can lock themselves into crevices for protection.",
+            "They have vibrant, colorful patterns."
+        ]
+    },
+    {
+        "name": "Barracuda",
+        "shopify": "https://yourshopify.com/products/barracuda",
+        "image": "https://yourshopify.com/images/barracuda.jpg",
+        "facts": [
+            "Barracudas are fast predators with sharp teeth.",
+            "They can reach speeds of 27 mph.",
+            "They often hunt by ambush."
+        ]
+    },
+    {
+        "name": "Whale Shark",
+        "shopify": "https://yourshopify.com/products/whale-shark",
+        "image": "https://yourshopify.com/images/whale-shark.jpg",
+        "facts": [
+            "Whale sharks are the largest fish in the sea.",
+            "They are gentle filter feeders.",
+            "They can live up to 70 years."
+        ]
+    },
+    {
+        "name": "Grouper",
+        "shopify": "https://yourshopify.com/products/grouper",
+        "image": "https://yourshopify.com/images/grouper.jpg",
+        "facts": [
+            "Groupers are ambush predators.",
+            "They can weigh over 800 pounds.",
+            "Many species are hermaphroditic."
+        ]
+    },
+    {
+        "name": "Pufferfish",
+        "shopify": "https://yourshopify.com/products/pufferfish",
+        "image": "https://yourshopify.com/images/pufferfish.jpg",
+        "facts": [
+            "Pufferfish can inflate to deter predators.",
+            "They contain tetrodotoxin, a potent toxin.",
+            "They have excellent eyesight."
+        ]
+    },
+    {
+        "name": "Leafy Sea Dragon",
+        "shopify": "https://yourshopify.com/products/leafy-sea-dragon",
+        "image": "https://yourshopify.com/images/leafy-sea-dragon.jpg",
+        "facts": [
+            "Leafy sea dragons resemble floating seaweed.",
+            "They are related to seahorses.",
+            "They use camouflage to avoid predators."
+        ]
+    },
+    {
+        "name": "Nudibranch",
+        "shopify": "https://yourshopify.com/products/nudibranch",
+        "image": "https://yourshopify.com/images/nudibranch.jpg",
+        "facts": [
+            "Nudibranchs are colorful sea slugs.",
+            "They have incredible patterns and colors.",
+            "They feed on sponges and other small organisms."
+        ]
+    },
+    {
+        "name": "Horseshoe Crab",
+        "shopify": "https://yourshopify.com/products/horseshoe-crab",
+        "image": "https://yourshopify.com/images/horseshoe-crab.jpg",
+        "facts": [
+            "Horseshoe crabs have blue blood used in medicine.",
+            "They have existed for over 450 million years.",
+            "They are more closely related to spiders than crabs."
+        ]
+    },
+    {
+        "name": "Dolphin",
+        "shopify": "https://yourshopify.com/products/dolphin",
+        "image": "https://yourshopify.com/images/dolphin.jpg",
+        "facts": [
+            "Dolphins are highly intelligent marine mammals.",
+            "They use echolocation for navigation.",
+            "They often live in social groups called pods."
+        ]
+    }
+]
