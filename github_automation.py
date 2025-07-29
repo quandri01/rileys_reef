@@ -1,101 +1,80 @@
-import subprocess
 import os
+import subprocess
+import datetime
 import json
 import random
-import requests
-from datetime import datetime
+import sys
+from dotenv import load_dotenv
 
-# === CONFIG ===
-REPO_PATH = r"C:\rileys_reef"
-PUZZLE_DIR = os.path.join(REPO_PATH, "puzzles")
-STORY_DIR = os.path.join(REPO_PATH, "stories")
-CREATURE_FILE = os.path.join(REPO_PATH, "creatures.json")
-USED_FILE = os.path.join(REPO_PATH, "used_creatures.json")
+# Load environment variables
+load_dotenv()
 
-# === FOLDER SETUP ===
-os.makedirs(PUZZLE_DIR, exist_ok=True)
-for lvl in ["easy", "medium", "tricky_fish"]:
-    os.makedirs(os.path.join(PUZZLE_DIR, lvl), exist_ok=True)
-os.makedirs(STORY_DIR, exist_ok=True)
+CREATURES_FILE = "creatures.json"
+USED_CREATURES_FILE = "used_creatures.json"
+STORY_GENERATOR = "story_generator.py"
+PUZZLE_GENERATOR = "puzzle_generator.py"
+SEND_EMAIL_SCRIPT = "send_preview_email.py"
 
-# === Load creatures ===
-with open(CREATURE_FILE, "r", encoding="utf-8") as f:
-    creatures = json.load(f)
+def pick_creature():
+    """Pick a creature not used yet."""
+    with open(CREATURES_FILE, "r") as f:
+        creatures = json.load(f)
 
-used = []
-if os.path.exists(USED_FILE):
-    with open(USED_FILE, "r", encoding="utf-8") as f:
-        used = json.load(f)
+    if os.path.exists(USED_CREATURES_FILE):
+        with open(USED_CREATURES_FILE, "r") as f:
+            used_creatures = json.load(f)
+    else:
+        used_creatures = []
 
-# === Helper: Fetch scientific name ===
-def get_scientific_name(creature):
-    try:
-        response = requests.get(
-            f"https://api.gbif.org/v1/species/match?name={creature}"
-        )
-        data = response.json()
-        return data.get("scientificName", creature)
-    except Exception as e:
-        print(f"⚠️ Could not fetch scientific name for {creature}. Using fallback.")
-        return creature
+    available = [c for c in creatures if c["name"] not in used_creatures]
 
-# === Helper: Clean old files ===
-def clean_old_files():
-    for root, dirs, files in os.walk(PUZZLE_DIR):
-        for file in files:
-            os.remove(os.path.join(root, file))
-    for file in os.listdir(STORY_DIR):
-        os.remove(os.path.join(STORY_DIR, file))
-    print("🧹 Old puzzles and stories cleaned.")
-
-# === Random Picker ===
-def pick_random_creature():
-    available = [c for c in creatures if c["name"] not in used]
+    # Reset if all creatures used
     if not available:
-        used.clear()
+        print("♻️ All creatures used, resetting list.")
         available = creatures
-    chosen = random.choice(available)
-    used.append(chosen["name"])
-    with open(USED_FILE, "w", encoding="utf-8") as f:
-        json.dump(used, f)
-    return chosen
+        used_creatures = []
 
-# === Prompt: Manual or Auto ===
-manual = input("Manual run? (y/n): ").strip().lower() == "y"
+    creature = random.choice(available)
+    used_creatures.append(creature["name"])
 
-if manual:
-    clean_old_files()
-    creature = input("Enter Creature Name: ").strip()
-    scientific = get_scientific_name(creature)
-    shopify = input("Enter Shopify URL: ").strip()
-    image = input("Enter Image URL: ").strip()
-    facts = input("Enter Fun Facts (comma separated): ").strip().split(",")
-else:
-    selected = pick_random_creature()
-    creature = selected["name"]
-    scientific = get_scientific_name(creature)
-    shopify = selected.get("shopify", "")
-    image = selected.get("image", "")
-    facts = selected.get("facts", [])
+    with open(USED_CREATURES_FILE, "w") as f:
+        json.dump(used_creatures, f)
 
-print(f"\n🐠 Generating content for: {creature}\nScientific name: {scientific}\n")
+    return creature["name"]
 
-# === Generate Puzzles ===
-subprocess.run(["py", "puzzle_generator.py", creature], cwd=REPO_PATH, check=True)
-print("✅ Puzzles generated")
+def run_script(script, *args):
+    """Run Python script safely."""
+    subprocess.run(["py", script, *args], check=True)
 
-# === Generate Story ===
-story_cmd = ["py", "story_generator.py", creature, scientific, shopify, image] + facts
-subprocess.run(story_cmd, cwd=REPO_PATH, check=True)
-print("✅ Story generated")
+def main():
+    print("🐠 Riley's Reef Automation Started")
 
-# === Git Push ===
-subprocess.run(["git", "add", "."], cwd=REPO_PATH, check=True)
-commit_msg = f"Auto-update {creature} {datetime.now():%Y-%m-%d %H:%M:%S}"
-subprocess.run(["git", "commit", "-m", commit_msg], cwd=REPO_PATH)
-subprocess.run(["git", "push", "origin", "main"], cwd=REPO_PATH)
-print("🚀 GitHub updated successfully")
+    # --- Automatic or Manual selection ---
+    if len(sys.argv) > 1:
+        creature_name = " ".join(sys.argv[1:])  # Manual mode
+        print(f"🦑 Manual creature selected: {creature_name}")
+    else:
+        creature_name = pick_creature()         # Auto mode
+        print(f"🦑 Automatically picked: {creature_name}")
 
-# === Send Preview Email ===
-subprocess.run(["py", "send_preview_email.py", creature], cwd=REPO_PATH, check=True)
-print("📧 Preview email sent successfully")
+    # 1. Generate puzzles (easy/medium/tricky)
+    run_script(PUZZLE_GENERATOR, creature_name)
+
+    # 2. Generate story
+    run_script(STORY_GENERATOR, creature_name)
+
+    # 3. Commit changes
+    subprocess.run(["git", "add", "."], check=True)
+    commit_msg = f"Auto-update {creature_name} {datetime.datetime.now():%Y-%m-%d %H:%M:%S}"
+    subprocess.run(["git", "commit", "-m", commit_msg], check=True)
+
+    # 4. Push to GitHub
+    subprocess.run(["git", "push", "origin", "main"], check=True)
+
+    # 5. Send preview email
+    run_script(SEND_EMAIL_SCRIPT, creature_name)
+
+    print("✅ Riley's Reef automation finished successfully.")
+
+if __name__ == "__main__":
+    main()

@@ -1,47 +1,63 @@
-import os
 import sys
+import json
+import os
+import requests
 
-def generate_story(creature, scientific_name, shopify_url, image_url, facts):
-    shopify_section = (
-        f'<p>Want your very own {creature.title()} figure? '
-        f'<a href="{shopify_url}">Click here</a> to see it in our store!</p>'
-        if shopify_url and "yourshopify" not in shopify_url else ""
-    )
+CREATURES_FILE = "creatures.json"
+STORY_OUTPUT_DIR = "stories"
 
-    image_section = (
-        f'<img src="{image_url}" alt="{creature.title()}" style="width:200px;">'
-        if image_url and "yourshopify" not in image_url else ""
-    )
+def fetch_scientific_name_online(creature_name):
+    """Fetches the scientific name from an online API (placeholder)."""
+    try:
+        response = requests.get(f"https://api.gbif.org/v1/species/match?name={creature_name}")
+        data = response.json()
+        if "scientificName" in data:
+            return data["scientificName"]
+    except Exception as e:
+        print(f"⚠️ Online lookup failed: {e}")
+    return None
 
-    facts_list = ''.join(f'<li>{fact}</li>' for fact in facts)
+def get_scientific_name(creature_name):
+    """Checks JSON first, then fetches online if missing."""
+    if os.path.exists(CREATURES_FILE):
+        with open(CREATURES_FILE, "r") as f:
+            creatures = json.load(f)
+        for creature in creatures:
+            if creature["name"].lower() == creature_name.lower() and "scientific_name" in creature:
+                return creature["scientific_name"]
 
-    return f"""<html>
-<head><title>Riley’s Reef — {creature.title()} Spotlight</title></head>
-<body>
-<h1>Meet the Amazing {creature.title()}!</h1>
-{image_section}
-<p>Today's ocean star is the playful <strong>{creature.title()}</strong> (<em>{scientific_name}</em>).</p>
-
-<h3>Fun Facts:</h3>
-<ul>{facts_list}</ul>
-{shopify_section}
-</body>
-</html>"""
+    # Fallback to online lookup
+    sci_name = fetch_scientific_name_online(creature_name)
+    return sci_name if sci_name else "Unknownus Oceanus"
 
 def main():
-    creature = sys.argv[1]
-    scientific_name = sys.argv[2]
-    shopify_url = sys.argv[3] if len(sys.argv) > 3 else ""
-    image_url = sys.argv[4] if len(sys.argv) > 4 else ""
-    facts = sys.argv[5:]
-    
-    os.makedirs("stories", exist_ok=True)
-    filename = os.path.join("stories", f"story_{creature.lower()}.html")
-    
-    with open(filename, "w", encoding="utf-8") as f:
-        f.write(generate_story(creature, scientific_name, shopify_url, image_url, facts))
-    
-    print(f"✅ Story generated: {filename}")
+    if len(sys.argv) < 2:
+        print("❌ No creature name provided to story generator.")
+        sys.exit(1)
+
+    creature_name = sys.argv[1]
+    scientific_name = get_scientific_name(creature_name)
+
+    if not os.path.exists(STORY_OUTPUT_DIR):
+        os.makedirs(STORY_OUTPUT_DIR)
+
+    # Generate story HTML
+    story_content = f"""
+    <html>
+    <head><title>{creature_name} Story</title></head>
+    <body>
+        <h1>{creature_name}</h1>
+        <h2><i>{scientific_name}</i></h2>
+        <p>Today, Riley encounters a fascinating {creature_name.lower()} in the ocean...</p>
+    </body>
+    </html>
+    """
+
+    output_path = os.path.join(STORY_OUTPUT_DIR, f"{creature_name.lower().replace(' ', '_')}.html")
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(story_content)
+
+    print(f"✅ Story generated: {output_path}")
 
 if __name__ == "__main__":
     main()
